@@ -13,7 +13,7 @@ Możesz również wywołać te same komendy folder wyżej - wtedy uruchomisz jed
 
 #### Produkty
 
-Elementy zwracane i zapisywane do serwera mają takie pola:
+Elementy zwracane oraz zapisywane do serwera mają takie pola:
 
 ```json
 {
