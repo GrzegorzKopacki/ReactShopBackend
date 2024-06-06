@@ -1,29 +1,30 @@
-const express = require("express");
-const app = express();
-const port = process.env.PORT || 3000;
-const fs = require("fs");
-const path = require("path");
-
-// Serwowanie statycznych plików z folderu 'public'
-app.use(express.static("public"));
-
-// Endpoint dla ścieżki root
-app.get("/", (req, res) => {
-	res.send("Hello, World!");
-});
-
-// Endpoint do zwracania danych z pliku db.json
-app.get("/data", (req, res) => {
-	const dbPath = path.join(__dirname, "db.json");
-	fs.readFile(dbPath, "utf8", (err, data) => {
+// Endpointy dla bestsellerów w różnych kategoriach
+app.get("/women/bestsellers", (req, res) => {
+	readData((err, data) => {
 		if (err) {
 			return res.status(500).send("Error reading database file.");
 		}
-		res.send(JSON.parse(data));
+		const womenBestsellers = data.women.bestsellers || [];
+		res.json(womenBestsellers);
 	});
 });
 
-// Uruchomienie serwera
-app.listen(port, () => {
-	console.log(`Server is running on port ${port}`);
+app.get("/men/bestsellers", (req, res) => {
+	readData((err, data) => {
+		if (err) {
+			return res.status(500).send("Error reading database file.");
+		}
+		const menBestsellers = data.men.bestsellers || [];
+		res.json(menBestsellers);
+	});
+});
+
+app.get("/children/bestsellers", (req, res) => {
+	readData((err, data) => {
+		if (err) {
+			return res.status(500).send("Error reading database file.");
+		}
+		const childrenBestsellers = data.children.bestsellers || [];
+		res.json(childrenBestsellers);
+	});
 });
