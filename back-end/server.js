@@ -1,10 +1,11 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
-const port = process.env.PORT || 3000;
 const fs = require("fs");
 const path = require("path");
 
 // Middleware do parsowania JSON
+app.use(cors());
 app.use(express.json());
 
 // Serwowanie statycznych plików z folderu 'public'
@@ -137,6 +138,8 @@ app.get("/children/bestsellers", (req, res) => {
 		res.json(childrenBestsellers);
 	});
 });
+
+const port = process.env.PORT || 8888;
 
 // Uruchomienie serwera
 app.listen(port, () => {
