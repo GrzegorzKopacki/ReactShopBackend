@@ -139,6 +139,22 @@ app.get("/children/bestsellers", (req, res) => {
 	});
 });
 
+app.get("/bestsellers", (req, res) => {
+    readData((err, data) => {
+        if (err) {
+            return res.status(500).send("Error reading database file.");
+        }
+
+        const bestsellers = {
+            women: data.women.bestsellers || [],
+            men: data.men.bestsellers || [],
+            children: data.children.bestsellers || []
+        };
+
+        res.json(bestsellers);
+    });
+});
+
 const port = process.env.PORT || 8888;
 
 // Uruchomienie serwera
