@@ -155,45 +155,33 @@ app.get("/bestsellers", (req, res) => {
 	});
 });
 
-app.get("/products/gender/category/subcategory", (req, res) => {
-	const { gender, category, subcategory } = req.params;
-	
-
-	// Jeśli productId jest wymagane, sprawdzamy jego obecność
-	
-
+app.get("/api/products", (req, res) => {
+	const { gender, category, subcategory } = req.query;
+  
 	readData((err, data) => {
-		if (err) {
-			return res.status(500).send("Error reading database file.");
-		}
-
-		// Wczytaj dane z pliku db.json
-		const { products } = data;
-
-		// Filtrowanie produktów na podstawie parametrów zapytania
-		let filteredProducts = products.filter((product) => {
-			// Sprawdź zgodność płci
-			if (product.gender !== gender) {
-				return false;
-			}
-			// Sprawdź zgodność kategorii
-			if (product.category !== category) {
-				return false;
-			}
-			// Sprawdź zgodność podkategorii, jeśli jest określona
-			if (subcategory && product.subcategory !== subcategory) {
-				return false;
-			}
-			// Jeśli subcategory nie jest określone, zwróć produkty bez względu na podkategorie
-			if (!subcategory && product.subcategory) {
-				return false;
-			}
-			return true;
-		});
-
-		res.json(filteredProducts);
+	  if (err) {
+		return res.status(500).send("Error reading database file.");
+	  }
+  
+	  let products = [];
+  
+	  if (gender && category) {
+		products = data[gender]?.[category] || [];
+	  } else if (gender) {
+		products = data[gender] ? Object.values(data[gender]) : [];
+	  } else {
+		products = Object.values(data).flat();
+	  }
+  
+	  if (subcategory) {
+		products = products.filter((product) => product.subcategory === subcategory);
+	  }
+  
+	  res.json(products);
 	});
-});
+  });
+
+
 
 const port = process.env.PORT || 8888;
 
@@ -220,3 +208,43 @@ app.listen(port, () => {
 // server.use(router);
 
 // server.listen(port);
+
+// app.get("/products/gender/category/subcategory", (req, res) => {
+// 	const { gender, category, subcategory } = req.params;
+
+// 	console.log("Gender:", gender);
+// 	console.log("Category:", category);
+// 	console.log("Subcategory:", subcategory);
+
+// 	readData((err, data) => {
+// 		if (err) {
+// 			return res.status(500).send("Error reading database file.");
+// 		}
+
+// 		// Wczytaj dane z pliku db.json
+// 		const { products } = data;
+
+// 		// Filtrowanie produktów na podstawie parametrów zapytania
+// 		let filteredProducts = products.filter((product) => {
+// 			// Sprawdź zgodność płci
+// 			if (product.gender !== gender) {
+// 				return false;
+// 			}
+// 			// Sprawdź zgodność kategorii
+// 			if (product.category !== category) {
+// 				return false;
+// 			}
+// 			// Sprawdź zgodność podkategorii, jeśli jest określona
+// 			if (subcategory && product.subcategory !== subcategory) {
+// 				return false;
+// 			}
+// 			// Jeśli subcategory nie jest określone, zwróć produkty bez względu na podkategorie
+// 			if (!subcategory && product.subcategory) {
+// 				return false;
+// 			}
+// 			return true;
+// 		});
+
+// 		res.json(filteredProducts);
+// 	});
+// });
