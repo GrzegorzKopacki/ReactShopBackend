@@ -157,6 +157,12 @@ app.get("/bestsellers", (req, res) => {
 
 app.get("/api/products/:gender/:category/:subcategory?", (req, res) => {
 	const { gender, category, subcategory } = req.params;
+	const { productId } = req.query; // Przyjmujemy productId z parametrów zapytania
+
+	// Jeśli productId jest wymagane, sprawdzamy jego obecność
+	if (!productId) {
+		return res.status(400).send("Product ID is required");
+	}
 
 	readData((err, data) => {
 		if (err) {
@@ -186,7 +192,6 @@ app.get("/api/products/:gender/:category/:subcategory?", (req, res) => {
 		res.json(filteredProducts);
 	});
 });
-
 const port = process.env.PORT || 8888;
 
 // Uruchomienie serwera
