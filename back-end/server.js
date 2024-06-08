@@ -3,6 +3,7 @@ const cors = require("cors");
 const app = express();
 const fs = require("fs");
 const path = require("path");
+// const { productListLoader } = require(".");
 
 // Middleware do parsowania JSON
 app.use(cors());
@@ -153,6 +154,12 @@ app.get("/bestsellers", (req, res) => {
 
         res.json(bestsellers);
     });
+});
+
+app.get("/api/products/:gender/:category/:subcategory?", async (req, res) => {
+    const { gender, category, subcategory } = req.params;
+    const productList = await productListLoader({ params: { gender, category, subcategory }, request: req });
+    res.json(productList);
 });
 
 const port = process.env.PORT || 8888;
