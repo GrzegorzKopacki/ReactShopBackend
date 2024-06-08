@@ -156,6 +156,23 @@ app.get("/bestsellers", (req, res) => {
 	});
 });
 
+app.get("/products/:productId", (req, res) => {
+    const productId = req.params.productId;
+    
+    readData((err, data) => {
+        if (err) {
+            return res.status(500).send("Error reading database file.");
+        }
+
+        const product = data.products.find((p) => p.id === productId);
+        if (!product) {
+            return res.status(404).send("Product not found");
+        }
+
+        res.json(product);
+    });
+});
+
 
 const port = process.env.PORT || 8888;
 
