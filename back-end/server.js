@@ -3,9 +3,6 @@ const cors = require("cors");
 const app = express();
 const fs = require("fs");
 const path = require("path");
-const {
-	productListLoader,
-} = require("../../ReactShop/front-end/src/api/productListLoader");
 
 // Middleware do parsowania JSON
 app.use(cors());
@@ -158,13 +155,36 @@ app.get("/bestsellers", (req, res) => {
 	});
 });
 
-app.get("/api/products/:gender/:category/:subcategory?", async (req, res) => {
+app.get("/api/products/:gender/:category/:subcategory?", (req, res) => {
 	const { gender, category, subcategory } = req.params;
-	const productList = await productListLoader({
-		params: { gender, category, subcategory },
-		request: req,
+
+	readData((err, data) => {
+		if (err) {
+			return res.status(500).send("Error reading database file.");
+		}
+
+		// Wczytaj dane z pliku db.json
+		const { products } = data;
+
+		// Filtrowanie produktów na podstawie parametrów zapytania
+		let filteredProducts = products.filter((product) => {
+			// Sprawdź zgodność płci
+			if (product.gender !== gender) {
+				return false;
+			}
+			// Sprawdź zgodność kategorii
+			if (product.category !== category) {
+				return false;
+			}
+			// Sprawdź zgodność podkategorii, jeśli jest określona
+			if (subcategory && product.subcategory !== subcategory) {
+				return false;
+			}
+			return true;
+		});
+
+		res.json(filteredProducts);
 	});
-	res.json(productList);
 });
 
 const port = process.env.PORT || 8888;
