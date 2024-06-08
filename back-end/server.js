@@ -3,11 +3,7 @@ const cors = require("cors");
 const app = express();
 const fs = require("fs");
 const path = require("path");
-import {
-	GENDERS,
-	CATEGORIES,
-} from "../../ReactShop/front-end/src/constants/categories";
-import { productListLoader } from "../../ReactShop/front-end/src/api/productListLoader";
+
 
 // Middleware do parsowania JSON
 app.use(cors());
@@ -160,40 +156,6 @@ app.get("/bestsellers", (req, res) => {
 	});
 });
 
-app.get("/api/products", async (req, res) => {
-	const { gender, category, subcategory } = req.query;
-
-	try {
-		// Sprawdzenie, czy podana płeć jest prawidłowa
-		const foundGender = GENDERS.find((g) => g.path === gender);
-		if (!foundGender) {
-			return res.status(400).json({ error: "Invalid gender" });
-		}
-
-		// Sprawdzenie, czy podana kategoria jest prawidłowa
-		const foundCategory = CATEGORIES.find((c) => c.path === category);
-		if (!foundCategory) {
-			return res.status(400).json({ error: "Invalid category" });
-		}
-
-		// Wywołaj funkcję productListLoader, aby pobrać dane o produktach
-		const { products, numberOfPages } = await productListLoader({
-			params: { gender, category, subcategory },
-			request: req,
-		});
-
-		res.json({ products, numberOfPages });
-	} catch (error) {
-		// Obsłuż błędy
-		if (error.status === 301 || error.status === 302) {
-			// Przekierowanie
-			return res.redirect(error.location);
-		} else {
-			// Inne błędy
-			return res.status(500).json({ error: "Internal server error" });
-		}
-	}
-});
 
 const port = process.env.PORT || 8888;
 
