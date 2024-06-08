@@ -70,7 +70,7 @@ fetch('http://localhost:3000/products`)
     .console.log(res => res.json());
 ```
 
-Konsola:
+Knsola:
 
 ```js
 [
