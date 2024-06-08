@@ -159,6 +159,10 @@ app.get("/api/products/:gender/:category/:subcategory?", (req, res) => {
 	const { gender, category, subcategory } = req.params;
 	const { productId } = req.query; // Przyjmujemy productId z parametrów zapytania
 
+	console.log("Gender:", gender);
+	console.log("Category:", category);
+	console.log("Subcategory:", subcategory);
+
 	// Jeśli productId jest wymagane, sprawdzamy jego obecność
 	if (!productId) {
 		return res.status(400).send("Product ID is required");
@@ -186,12 +190,17 @@ app.get("/api/products/:gender/:category/:subcategory?", (req, res) => {
 			if (subcategory && product.subcategory !== subcategory) {
 				return false;
 			}
+			// Jeśli subcategory nie jest określone, zwróć produkty bez względu na podkategorie
+			if (!subcategory && product.subcategory) {
+				return false;
+			}
 			return true;
 		});
 
 		res.json(filteredProducts);
 	});
 });
+
 const port = process.env.PORT || 8888;
 
 // Uruchomienie serwera
