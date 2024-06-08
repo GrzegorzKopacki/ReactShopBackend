@@ -3,7 +3,9 @@ const cors = require("cors");
 const app = express();
 const fs = require("fs");
 const path = require("path");
-// const { productListLoader } = require(".");
+const {
+	productListLoader,
+} = require("../../ReactShop/front-end/src/api/productListLoader");
 
 // Middleware do parsowania JSON
 app.use(cors());
@@ -141,25 +143,28 @@ app.get("/children/bestsellers", (req, res) => {
 });
 
 app.get("/bestsellers", (req, res) => {
-    readData((err, data) => {
-        if (err) {
-            return res.status(500).send("Error reading database file.");
-        }
+	readData((err, data) => {
+		if (err) {
+			return res.status(500).send("Error reading database file.");
+		}
 
-        const bestsellers = {
-            women: data.women.bestsellers || [],
-            men: data.men.bestsellers || [],
-            children: data.children.bestsellers || []
-        };
+		const bestsellers = {
+			women: data.women.bestsellers || [],
+			men: data.men.bestsellers || [],
+			children: data.children.bestsellers || [],
+		};
 
-        res.json(bestsellers);
-    });
+		res.json(bestsellers);
+	});
 });
 
 app.get("/api/products/:gender/:category/:subcategory?", async (req, res) => {
-    const { gender, category, subcategory } = req.params;
-    const productList = await productListLoader({ params: { gender, category, subcategory }, request: req });
-    res.json(productList);
+	const { gender, category, subcategory } = req.params;
+	const productList = await productListLoader({
+		params: { gender, category, subcategory },
+		request: req,
+	});
+	res.json(productList);
 });
 
 const port = process.env.PORT || 8888;
@@ -168,7 +173,6 @@ const port = process.env.PORT || 8888;
 app.listen(port, () => {
 	console.log(`Server is running on port ${port}`);
 });
-
 
 // const jsonServer = require('json-server');
 // const server = jsonServer.create();
