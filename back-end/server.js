@@ -4,92 +4,6 @@ const app = express();
 const fs = require("fs");
 const path = require("path");
 
-export const GENDERS = [
-	{
-		categoryName: "Kobieta",
-		path: "kobieta",
-	},
-	{
-		categoryName: "Mężczyzna",
-		path: "mezczyzna",
-	},
-	{
-		categoryName: "Dziecko",
-		path: "dziecko",
-	},
-];
-
-export const CATEGORIES = [
-	{
-		categoryName: "Odzież",
-		path: "odziez",
-		subcategories: [
-			{
-				categoryName: "Koszulki",
-				path: "koszulki",
-			},
-			{
-				categoryName: "Swetry",
-				path: "swetry",
-			},
-			{
-				categoryName: "Spodnie",
-				path: "spodnie",
-			},
-		],
-	},
-	{
-		categoryName: "Obuwie",
-		path: "obuwie",
-		subcategories: [
-			{
-				categoryName: "Eleganckie",
-				path: "eleganckie",
-			},
-			{
-				categoryName: "Sportowe",
-				path: "sportowe",
-			},
-			{
-				categoryName: "Sneakersy",
-				path: "sneakersy",
-			},
-		],
-	},
-	{
-		categoryName: "Akcesoria",
-		path: "akcesoria",
-		subcategories: [
-			{
-				categoryName: "Torby",
-				path: "torby",
-			},
-			{
-				categoryName: "Zegarki",
-				path: "zegarki",
-			},
-		],
-	},
-	{
-		categoryName: "Sport",
-		path: "sport",
-		subcategories: [
-			{
-				categoryName: "Piłka nożna",
-				path: "pilkanozna",
-			},
-			{
-				categoryName: "Narty",
-				path: "narty",
-			},
-			{
-				categoryName: "Pływane",
-				path: "plywanie",
-			},
-		],
-	},
-];
-
 // Middleware do parsowania JSON
 app.use(cors());
 app.use(express.json());
@@ -241,54 +155,39 @@ app.get("/bestsellers", (req, res) => {
 	});
 });
 
-app.get("/api/products/:gender/:category/:subcategory?", (req, res) => {
+app.get("/products/gender/category/subcategory", (req, res) => {
 	const { gender, category, subcategory } = req.params;
+	
 
-	// Sprawdź, czy przekazane kategorie i podkategorie są poprawne
-	const foundGender = GENDERS.find((g) => g.path === gender);
-	if (!foundGender) {
-		return res.status(400).send("Invalid gender.");
-	}
+	// Jeśli productId jest wymagane, sprawdzamy jego obecność
+	
 
-	const foundCategory = CATEGORIES.find((c) => c.path === category);
-	if (!foundCategory) {
-		return res.status(400).send("Invalid category.");
-	}
-
-	let foundSubcategory;
-	if (subcategory) {
-		foundSubcategory = foundCategory.subcategories.find(
-			(sc) => sc.path === subcategory
-		);
-		if (!foundSubcategory) {
-			return res.status(400).send("Invalid subcategory.");
-		}
-	}
-
-	// Tutaj dodaj logikę pobierania produktów zgodnie z przekazanymi parametrami
-	// Przykładowo, odczytaj dane z pliku JSON
-	const dbPath = path.join(__dirname, "db.json");
-	fs.readFile(dbPath, "utf8", (err, data) => {
+	readData((err, data) => {
 		if (err) {
 			return res.status(500).send("Error reading database file.");
 		}
 
-		const products = JSON.parse(data).products;
+		// Wczytaj dane z pliku db.json
+		const { products } = data;
 
-		// Filtrowanie produktów na podstawie przekazanych parametrów
-		const filteredProducts = products.filter((product) => {
+		// Filtrowanie produktów na podstawie parametrów zapytania
+		let filteredProducts = products.filter((product) => {
+			// Sprawdź zgodność płci
 			if (product.gender !== gender) {
 				return false;
 			}
-
+			// Sprawdź zgodność kategorii
 			if (product.category !== category) {
 				return false;
 			}
-
+			// Sprawdź zgodność podkategorii, jeśli jest określona
 			if (subcategory && product.subcategory !== subcategory) {
 				return false;
 			}
-
+			// Jeśli subcategory nie jest określone, zwróć produkty bez względu na podkategorie
+			if (!subcategory && product.subcategory) {
+				return false;
+			}
 			return true;
 		});
 
